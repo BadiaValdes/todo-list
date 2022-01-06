@@ -4,8 +4,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository, ILike, Like, Equal, In } from 'typeorm';
-import { PaginateDTO, FilterOptions } from '../pagination/paginate.dto';
-import { Paginate } from '../pagination/paginate';
+import {
+  PaginateDTO,
+  FilterOptions,
+} from '../@helpers/pagination/paginate.dto';
+import { Paginate } from '../@helpers/pagination/paginate';
+import { Validation } from '../@helpers/validations/db-data-validations';
+import { Encrypt } from '../@helpers/data-modification/data-modification';
 
 @Injectable()
 export class UserService {
@@ -66,12 +71,11 @@ export class UserService {
     //   take: pagination.take ? pagination.take : 10000,
     //   where: where,
     // }));
-    
+
     return Paginate.paginate<User>(User, pagination);
   }
 
   async findOne(id: string) {
-
     return await this.findAll({
       skip: 0,
       take: 1,
@@ -85,44 +89,53 @@ export class UserService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    updateUserDto.id = id;
+    await this.validateFields(updateUserDto);
+    if (updateUserDto.password) {
+      let password = (await this.findOne(updateUserDto.id)).items[0].password;
+      updateUserDto.password = await Encrypt.compareAndEncrypt(
+        updateUserDto.password,
+        password,
+      );     
+    }
+    return this.userRepo.save(updateUserDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    return this.userRepo.softRemove(await this.userRepo.findOne(id));
+  }
+
+  async removeMany(ids: string[]) {
+    return this.userRepo.softRemove(await this.userRepo.findByIds(ids));;
   }
 
   private async validateFields(userData: CreateUserDto | UpdateUserDto) {
     if (userData.userName) {
-      const user = this.userRepo.findOne({
-        where: [
-          {
-            userName: ILike(userData.userName),
-          },
-        ],
-      });
-      const userMail = this.userRepo.findOne({
-        where: [
-          {
-            email: ILike(userData.email),
-          },
-        ],
-      });
-
+      const user = await Validation.elementInDB(
+        'userName',
+        userData.userName,
+        User,
+      );
+      const userMail = await Validation.elementInDB(
+        'email',
+        userData.email,
+        User,
+      );
       if ('id' in userData) {
         if (userData.id === null || userData.id === undefined) {
           throw Error('The ID cant be null');
         }
         if (
-          (await user).id !== userData.id ||
-          (await userMail).id !== userData.id
+          !Validation.elementID(userData.id, [
+            user && user.id ? user.id : '',
+            userMail && userMail.id ? userMail.id : '',
+          ])
         ) {
           throw Error('The username or email already exist');
         }
       } else {
-        console.log(await user);
-        if ((await user) || (await userMail)) {
+        if (user || userMail) {
           throw Error('The username or email already exist');
         }
       }

@@ -33,12 +33,7 @@ export function getFiltersOr(filterOr: IFilter[]) {
         operation = Not(In(data.value));
         where[data.fieldName] = operation;
       } else {
-        let val = '';
-        if (isArray(data.value)) {
-          val = data.value[0];
-        } else {
-          val = data.value;
-        }
+        let val = isArray(data.value) ? data.value[0] : data.value;
         if (data.operation === 'equals') {
           operation = Like(val);
         } else if (data.operation === 'equalsignorecase') {
@@ -67,12 +62,7 @@ export function getFiltersAnd(filterAnd: IFilter[], where) {
         operation = Not(In(data.value));
         where[0][data.fieldName] = operation;
       } else {
-        let val = '';
-        if (isArray(data.value)) {
-          val = data.value[0];
-        } else {
-          val = data.value;
-        }
+        let val = isArray(data.value) ? data.value[0] : data.value;
         if (data.operation === 'equals') {
           operation = Like(val);
         } else if (data.operation === 'equalsignorecase') {
@@ -84,7 +74,6 @@ export function getFiltersAnd(filterAnd: IFilter[], where) {
         }
         where[0][data.fieldName] = operation;
       }
-      
     });
   }
 }
