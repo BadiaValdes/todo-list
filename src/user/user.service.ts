@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository, ILike, Like, Equal, In } from 'typeorm';
+import { Repository, ILike, Like, Equal, In, getRepository } from 'typeorm';
 import {
   PaginateDTO,
   FilterOptions,
@@ -11,6 +11,8 @@ import {
 import { Paginate } from '../@helpers/pagination/paginate';
 import { Validation } from '../@helpers/validations/db-data-validations';
 import { Encrypt } from '../@helpers/data-modification/data-modification';
+import { Test } from 'src/test/entities/test.entity';
+import { Messages } from '../@helpers/validations/messages';
 
 @Injectable()
 export class UserService {
@@ -22,6 +24,9 @@ export class UserService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     await this.validateFields(createUserDto);
     const userCreation = this.userRepo.create(createUserDto);
+    userCreation.test = await getRepository(Test).save(
+      getRepository(Test).create(),
+    );
     return this.userRepo.save(userCreation);
   }
 
@@ -97,7 +102,7 @@ export class UserService {
       updateUserDto.password = await Encrypt.compareAndEncrypt(
         updateUserDto.password,
         password,
-      );     
+      );
     }
     return this.userRepo.save(updateUserDto);
   }
@@ -107,7 +112,7 @@ export class UserService {
   }
 
   async removeMany(ids: string[]) {
-    return this.userRepo.softRemove(await this.userRepo.findByIds(ids));;
+    return this.userRepo.softRemove(await this.userRepo.findByIds(ids));
   }
 
   private async validateFields(userData: CreateUserDto | UpdateUserDto) {
@@ -124,19 +129,19 @@ export class UserService {
       );
       if ('id' in userData) {
         if (userData.id === null || userData.id === undefined) {
-          throw Error('The ID cant be null');
+          throw Error(Messages.fieldCantBeNull("id"));
         }
         if (
-          !Validation.elementID(userData.id, [
+          Validation.elementID(userData.id, [
             user && user.id ? user.id : '',
             userMail && userMail.id ? userMail.id : '',
           ])
         ) {
-          throw Error('The username or email already exist');
+          throw Error(Messages.fieldsExist(['username', 'email']));
         }
       } else {
         if (user || userMail) {
-          throw Error('The username or email already exist');
+          throw Error(Messages.fieldsExist(['username', 'email']));
         }
       }
     }

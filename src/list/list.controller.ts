@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ListService } from './list.service';
 import { CreateListDto } from './dto/create-list.dto';
 import { UpdateListDto } from './dto/update-list.dto';
+import { PaginateDTO } from '../@helpers/pagination/paginate.dto';
 
 @Controller('list')
 export class ListController {
@@ -13,22 +14,27 @@ export class ListController {
   }
 
   @Get()
-  findAll() {
-    return this.listService.findAll();
+  findAll(@Body() pagination: PaginateDTO) {
+    return this.listService.findAll(pagination);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.listService.findOne(+id);
+    return this.listService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateListDto: UpdateListDto) {
-    return this.listService.update(+id, updateListDto);
+    updateListDto.id = id;
+    return this.listService.update(updateListDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.listService.remove(+id);
+    return this.listService.remove(id);
+  }
+  @Delete()
+  removeMany(@Body('ids') ids: string[]) {
+    return this.listService.removeMany(ids);
   }
 }

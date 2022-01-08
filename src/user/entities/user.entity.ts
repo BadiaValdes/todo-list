@@ -11,12 +11,18 @@ import {
   AfterLoad,
   BeforeInsert,
   BeforeUpdate,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
+import { List } from 'src/list/entities/list.entity';
+import { Test } from 'src/test/entities/test.entity';
 
 const dbcrypt = require('bcrypt');
 
 @Entity('user')
-@Unique(['userName'])
+@Unique(['userName','deletedAt'])
+@Unique(['email','deletedAt'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   @Index()
@@ -52,12 +58,19 @@ export class User {
   @VersionColumn({ default: 1, nullable: true })
   version: number;
 
-  private tempPass: string;
+  @OneToMany(()=> List, (l)=>l.creator)
+  list: List[];
 
-  @AfterLoad()
-  private saveTempPass(): void {
-    this.tempPass = this.password;
-  }
+  @OneToOne(()=> Test, (t) => t.id)
+  @JoinColumn({name:"test"})
+  test:Test
+
+  // private tempPass: string;
+
+  // @AfterLoad()
+  // private saveTempPass(): void {
+  //   this.tempPass = this.password;
+  // }
 
   @BeforeInsert()
   private async encryptPassword(): Promise<void> {
@@ -66,14 +79,17 @@ export class User {
     this.password = await dbcrypt.hash(this.password, salt);
   }
 
-  @BeforeUpdate()
-  private async encryptPasswordIfDifferent(): Promise<void> {
-    if (!this.validatePassword(this.tempPass)) {
-        this.encryptPassword();
-    }
-  }
+  // @BeforeUpdate()
+  // private async encryptPasswordIfDifferent(): Promise<void> {
+  //   if (!this.validatePassword(this.tempPass)) {
+  //     this.encryptPassword();
+  //   }
+  // }
 
-  private async validatePassword(password: string): Promise<boolean> {
-    return await dbcrypt.compare(password, this.password);
-  }
+  // private async validatePassword(password: string): Promise<boolean> {
+  //   return await dbcrypt.compare(password, this.password);
+  // }
 }
+
+
+
