@@ -5,4 +5,5 @@ export class CreateListDto {
   name: string;
   visibility: ListVisibility;
   creator: User;
+  selectionList: boolean;
 }

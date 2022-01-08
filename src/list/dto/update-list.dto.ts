@@ -9,4 +9,5 @@ export class UpdateListDto extends PartialType(CreateListDto) {
     visibility?: ListVisibility;
     creator?: User;  
     slug?: string;
+    selectionList?: boolean;
 }

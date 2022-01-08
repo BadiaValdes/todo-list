@@ -32,6 +32,7 @@ export class ListService {
   }
 
   async findAll(pagination: PaginateDTO) {
+    console.log((await Paginate.paginate<List>(List, pagination, 'list')).items[0].items)
     return await Paginate.paginate<List>(List, pagination, 'list');
   }
 

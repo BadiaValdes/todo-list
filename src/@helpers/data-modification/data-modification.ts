@@ -45,7 +45,7 @@ export function replaceAllSlug(
       replace += `${initialValue.split(valueToReplace)[index]}${value}`;
     }
   }
-  return replace;
+  return replace.toLowerCase();
 }
 
 export function replaceAll(

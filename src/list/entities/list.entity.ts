@@ -15,6 +15,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { Item } from 'src/item/entities/item.entity';
 
 // ENUM
 export enum ListVisibility {
@@ -39,8 +40,14 @@ export class List {
   @Column({ name: 'visibility', type: 'enum', enum: ListVisibility, default: ListVisibility.PRIVATE})
   visibility: ListVisibility;
 
+  @Column({name: "selection_list", type:"boolean", default: false, nullable: true})
+  selectionList: boolean;
+
   @ManyToOne(()=>User, (u)=> u.list, {nullable: false})
   creator: User;
+
+  @OneToMany(() => Item, (i) => i.list)
+  items: List[];
 
   @CreateDateColumn({ type: 'timestamp', nullable: true, name: 'created_at' })
   createdAt: Date;
