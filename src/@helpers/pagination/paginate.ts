@@ -3,6 +3,7 @@ import {
   PaginateDTO,
   IPaginationOUTData,
   IRelation,
+  IFilterOpParm,
 } from './paginate.dto';
 import {
   getRepository,
@@ -80,14 +81,37 @@ export class Paginate {
     tableAlias?: string,
   ) {
     let queryBuilder = getRepository(model).createQueryBuilder(tableAlias);
+
     queryBuilder = queryBuilder.skip(paginate.skip).take(paginate.take);
-    for (const iterator of paginate.relation as IRelation[]) {
-      queryBuilder = queryBuilder.leftJoinAndSelect(
-        iterator.fieldToJoin,
-        iterator.alias,
-      );
+
+    let where = '';
+    let params = {};
+
+    if (paginate.filter) {
+      let filerOParam = getFilterOperationsAndParams(paginate.filter);
+      [where, params] = constructWhere(filerOParam, false);
+      queryBuilder = queryBuilder.where(where, params);
+
+      console.log(where)
+      console.log(params)
     }
+
+    if (paginate.filterAnd) {
+      let filerOParam = getFilterOperationsAndParams(paginate.filterAnd);
+      [where, params] = constructWhere(filerOParam, true);
+      queryBuilder = queryBuilder.where(where, params);
+    }  
+
+    if (paginate.relation)
+      for (const iterator of paginate.relation as IRelation[]) {
+        queryBuilder = queryBuilder.leftJoinAndSelect(
+          iterator.fieldToJoin,
+          iterator.alias,
+        );
+      }
+
     const [items, count] = await queryBuilder.getManyAndCount();
+    
     return { items, count };
   }
 }
@@ -182,14 +206,93 @@ export function getFiltersAnd(filterAnd: IFilter[], where) {
             j = z;
           }
         }
-        console.log(operation)
+        console.log(operation);
         // j[data.fieldName.split('.')[1]] = operation;
         where[where.length - 1][data.fieldName.split('.')[0]] = j;
       } else {
         where[where.length - 1][data.fieldName] = operation;
       }
-      
     });
   }
- 
+}
+
+export function constructWhere(filters: IFilterOpParm[], andFilter: boolean): [string, unknown] {
+  let filterWhere = '';
+  const filterParams = {};
+  let paramCounter = 0;
+  for (const iterator of filters) {
+    if (filterWhere !== '') {
+      filterWhere = `${filterWhere} ${andFilter? "and" : "or"} `;
+    }
+    if (iterator.operation === 'IN') {
+      filterWhere += `${filterWhere} ${iterator.fieldName} ${iterator.operation} (:...value${paramCounter})`
+      filterParams[`value${paramCounter}`] = (iterator.value as string).split(',');    
+    } else if (iterator.operation === 'NOT IN') {
+      filterWhere += `${filterWhere} ${iterator.fieldName} ${iterator.operation} (:...value${paramCounter})`
+      filterParams[`value${paramCounter}`] = (iterator.value as string).split(',');  
+    } else {
+      filterWhere += `${filterWhere} ${iterator.fieldName} ${iterator.operation} :value${paramCounter}`;
+      filterParams[`value${paramCounter}`] = iterator.value;
+      
+    }
+    paramCounter++;
+  }
+
+  return [filterWhere, filterParams];
+}
+
+export function getFilterOperationsAndParams(
+  filter: IFilter[],
+): IFilterOpParm[] {
+  const filterOpParam: IFilterOpParm[] = [];
+
+  for (const iterator of filter) {
+    switch (iterator.operation) {
+      case 'equals':
+        filterOpParam.push({
+          fieldName: iterator.fieldName,
+          operation: '=',
+          value: `${iterator.value as string}`,
+        });
+        break;
+      case 'equalsignorecase':
+        filterOpParam.push({
+          fieldName: iterator.fieldName,
+          operation: 'ILIKE',
+          value: `${iterator.value as string}`,
+        });
+        break;
+      case 'contains':
+        filterOpParam.push({
+          fieldName: iterator.fieldName,
+          operation: 'ILIKE',
+          value: `%${iterator.value as string}%`,
+        });
+        break;
+      case 'different':
+        filterOpParam.push({
+          fieldName: iterator.fieldName,
+          operation: 'NOT ILIKE',
+          value: `${iterator.value as string}`,
+        });
+        break;
+      case 'in':
+        filterOpParam.push({
+          fieldName: iterator.fieldName,
+          operation: 'IN',
+          value: `${iterator.value as string[]}`,
+        });
+        break;
+      case 'notIn':
+        filterOpParam.push({
+          fieldName: iterator.fieldName,
+          operation: 'NOT IN',
+          value: `${iterator.value as string[]}`,
+        });
+        break;
+      default:
+        break;
+    }
+  }
+  return filterOpParam;
 }

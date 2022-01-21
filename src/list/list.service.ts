@@ -36,6 +36,11 @@ export class ListService {
     return await Paginate.paginate<List>(List, pagination, 'list');
   }
 
+  async findAllQB(pagination: PaginateDTO) {
+    console.log((await Paginate.paginateQueryBuilder<List>(List, pagination, 'list')))
+    return await Paginate.paginateQueryBuilder<List>(List, pagination, 'list');
+  }
+
   async findAllQueryB(pagination: PaginateDTO) {
     return await Paginate.paginateQueryBuilder<List>(List, pagination, 'list');
   }

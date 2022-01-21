@@ -18,6 +18,11 @@ export class ListController {
     return this.listService.findAll(pagination);
   }
 
+  @Get('/query')
+  findAllQuery(@Body() pagination: PaginateDTO) {
+    return this.listService.findAllQueryB(pagination);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.listService.findOne(id);
