@@ -4,6 +4,6 @@ import { User } from "src/user/entities/user.entity";
 export class CreateListDto {
   name: string;
   visibility: ListVisibility;
-  creator: User;
+  creator?: User;
   selectionList: boolean;
 }

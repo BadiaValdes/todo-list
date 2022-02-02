@@ -25,14 +25,15 @@ export class ListService {
   ) {}
 
   async create(createListDto: CreateListDto) {
-    await this.validateList(createListDto);
+    // await this.validateList(createListDto);
+    console.log(createListDto);
     const valToCreate = this.listRepo.create(createListDto);
     valToCreate.slug = Slugify(valToCreate.name, '_');
     return this.listRepo.save(valToCreate);
   }
 
   async findAll(pagination: PaginateDTO) {
-    console.log((await Paginate.paginate<List>(List, pagination, 'list')).items[0].items)
+    // console.log((await Paginate.paginate<List>(List, pagination, 'list')).items[0].items)
     return await Paginate.paginate<List>(List, pagination, 'list');
   }
 

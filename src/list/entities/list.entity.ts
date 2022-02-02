@@ -13,6 +13,8 @@ import {
   BeforeUpdate,
   OneToMany,
   ManyToOne,
+  Tree,
+  TreeParent,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Item } from 'src/item/entities/item.entity';
@@ -43,11 +45,11 @@ export class List {
   @Column({name: "selection_list", type:"boolean", default: false, nullable: true})
   selectionList: boolean;
 
-  @ManyToOne(()=>User, (u)=> u.list, {nullable: false})
+  @ManyToOne(()=>User, (u)=> u.list, {nullable: true})
   creator: User;
 
-  @OneToMany(() => Item, (i) => i.list)
-  items: List[];
+  // @OneToMany(() => Item, (i) => i.list)
+  // items: List[];
 
   @CreateDateColumn({ type: 'timestamp', nullable: true, name: 'created_at' })
   createdAt: Date;

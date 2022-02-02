@@ -1,0 +1,41 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Item {
+  id: String!
+  itemName: String!
+  slug: String!
+  description: String!
+  marked: Boolean!
+
+  """UOM date of creation column"""
+  updatedAt: DateTime!
+
+  """UOM date of creation column"""
+  deletedAt: DateTime!
+  version: Int!
+  parentItem: Item!
+  childrenItems: [Item!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  itemsTree: [Item!]!
+}
+
+type Mutation {
+  createItem(item: CreateItemDto!): Item!
+}
+
+"""Datos de entrada"""
+input CreateItemDto {
+  itemName: String!
+  description: String!
+  marked: Boolean
+  parent: String
+}
