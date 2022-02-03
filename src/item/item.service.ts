@@ -66,7 +66,7 @@ export class ItemService {
         {
           fieldName: "id",
           operation: "equalsForID" as FilterOptions,
-          value: id,
+          value: [id],
         },
       ],
     });
@@ -104,14 +104,14 @@ export class ItemService {
           {
             fieldName: "itemName",
             operation: "equalsignorecase" as FilterOptions,
-            value: data.itemName,
+            value: [data.itemName],
           },
         ],
         filterAnd: [
           {
             fieldName: "list.id",
             operation: "equalsForID" as FilterOptions,
-            value: listId.toString(),
+            value: [listId.toString()],
           },
         ],
       });

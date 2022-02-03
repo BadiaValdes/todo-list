@@ -16,6 +16,7 @@ import {
   Slugify,
   replaceAll,
 } from '../@helpers/data-modification/data-modification';
+import { ListPagination } from './dto/paginate-list.dto';
 
 @Injectable()
 export class ListService {
@@ -37,8 +38,7 @@ export class ListService {
     return await Paginate.paginate<List>(List, pagination, 'list');
   }
 
-  async findAllQB(pagination: PaginateDTO) {
-    console.log((await Paginate.paginateQueryBuilder<List>(List, pagination, 'list')))
+  async findAllQB(pagination: PaginateDTO): Promise<ListPagination> {
     return await Paginate.paginateQueryBuilder<List>(List, pagination, 'list');
   }
 
@@ -54,7 +54,7 @@ export class ListService {
         {
           fieldName: 'id',
           operation: 'equalsForID' as FilterOptions,
-          value: id,
+          value: [id],
         },
       ],
     });
@@ -92,14 +92,14 @@ export class ListService {
           {
             fieldName: 'name',
             operation: 'equalsignorecase' as FilterOptions,
-            value: data.name,
+            value: [data.name],
           },
         ],
         filterAnd: [
           {
             fieldName: 'creator.id',
             operation: 'equalsForID' as FilterOptions,
-            value: userId.toString(),
+            value: [userId.toString()],
           },
         ],
       });

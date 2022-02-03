@@ -1,3 +1,5 @@
+import { InputType, Field, Int, ObjectType, registerEnumType } from "@nestjs/graphql";
+
 export class PaginateDTO {
   skip?: number;
   take?: number;
@@ -10,18 +12,28 @@ export class PaginateDTO {
   filterAnd?: IFilter[];
 }
 
+
+
 // INTERFACE FOR FILTER CONSTRUCTION IN REQUEST
-export interface IFilter {
+@InputType()
+export class IFilter {
+  @Field()
   fieldName: string;
+  @Field(type => FilterOptions)
   operation: FilterOptions;
-  value: string[] | string;
+  @Field(()=> [String])
+  value: string[];
 }
 
 // INTERFACE FOR QUERY BUILDER WHERE CONSTRUCTION
-export interface IFilterOpParm {
+@ObjectType()
+export class IFilterOpParm {
+  @Field()
   fieldName: string;
+  @Field()
   operation: string;
-  value: string[] | string;
+  @Field(type => String)
+  value: string;
 }
 
 // FILTERS OPTIONS
@@ -35,20 +47,50 @@ export enum FilterOptions {
   'different' = 'different'
 }
 
+registerEnumType(FilterOptions, {
+  name: 'FilterOptions',
+});
+
 // INTERFACE FOR DATA OUTPUT
-export interface IPaginationOUTData<T> {
+export class IPaginationOUTData<T> {
   count: number;
   items: T[];
 }
 
 // ORDERBY INTERFACE
-export interface IOrderBy {
+@InputType()
+export class IOrderBy {
+  @Field()
   fieldName: string;
+  @Field()
   order: 'ASC' | 'DESC';
 }
 
 // INTERFACE FOR QB RELATIONS
-export interface IRelation {
+@InputType()
+export class IRelation {
+  @Field()
   alias: string;
+  @Field()
   fieldToJoin: string;
+}
+
+// Pagination DTO Interface
+@InputType()
+export class PaginateDTOGrapQL {
+  @Field(type => Int)
+  skip?: number;
+  @Field(type => Int)
+  take?: number;
+  // IN QUERY BUILDER ONLY WORKS IRELATION
+  // U CAN USE BOTH IF U ARE NOT USING QB
+  @Field(type => [IRelation])
+  relation?: IRelation[];
+  // relation?: string[];
+  @Field(type => IOrderBy)
+  orderBy?: IOrderBy;
+  @Field(type => [IFilter])
+  filter?: IFilter[];
+  @Field(type => [IFilter])
+  filterAnd?: IFilter[];
 }

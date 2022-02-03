@@ -25,7 +25,7 @@ import { Field, ObjectType, GraphQLISODateTime, Int } from '@nestjs/graphql';
 @ObjectType()
 @Entity('item')
 @Tree('materialized-path')
-// @Unique(["itemName", "list", "deletedAt"])
+@Unique(['itemName', 'list', 'deletedAt'])
 export class Item {
   @PrimaryGeneratedColumn('uuid')
   @Index()
@@ -53,9 +53,9 @@ export class Item {
   @Field(() => Boolean)
   marked: boolean;
 
-  // @ManyToOne(() => List, (l) => l.items, { nullable: true })
-  // @JoinColumn({ name: "list_id" })
-  // list: List;
+  @ManyToOne(() => List, (l) => l.items, { nullable: true })
+  @JoinColumn({ name: 'list_id' })
+  list: List;
 
   @UpdateDateColumn({ type: 'timestamp', nullable: true, name: 'updated_at' })
   @Field(() => GraphQLISODateTime, {
@@ -65,7 +65,7 @@ export class Item {
   updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true, name: 'deleted_at' })
-    @Field(() => GraphQLISODateTime, {
+  @Field(() => GraphQLISODateTime, {
     description: 'UOM date of creation column',
     nullable: false,
   })

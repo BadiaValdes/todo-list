@@ -254,12 +254,12 @@ export function constructWhere(
     // Particular case of using IN or NOT IN where query 
     if (iterator.operation === 'IN') {
       filterWhere += `${filterWhere} ${iterator.fieldName} ${iterator.operation} (:...value${paramCounter})`;
-      filterParams[`value${paramCounter}`] = (iterator.value as string).split(
+      filterParams[`value${paramCounter}`] = (iterator.value[0] as string).split(
         ',',
       );
     } else if (iterator.operation === 'NOT IN') {
       filterWhere += `${filterWhere} ${iterator.fieldName} ${iterator.operation} (:...value${paramCounter})`;
-      filterParams[`value${paramCounter}`] = (iterator.value as string).split(
+      filterParams[`value${paramCounter}`] = (iterator.value[0] as string).split(
         ',',
       );
     } else {
@@ -294,28 +294,28 @@ export function getFilterOperationsAndParams(
         filterOpParam.push({
           fieldName: iterator.fieldName,
           operation: '=',
-          value: `${iterator.value as string}`,
+          value: `${iterator.value[0] as string}`,
         });
         break;
       case 'equalsignorecase':
         filterOpParam.push({
           fieldName: iterator.fieldName,
           operation: 'ILIKE',
-          value: `${iterator.value as string}`,
+          value: `${iterator.value[0] as string}`,
         });
         break;
       case 'contains':
         filterOpParam.push({
           fieldName: iterator.fieldName,
           operation: 'ILIKE',
-          value: `%${iterator.value as string}%`,
+          value: `%${iterator.value[0] as string}%`,
         });
         break;
       case 'different':
         filterOpParam.push({
           fieldName: iterator.fieldName,
           operation: 'NOT ILIKE',
-          value: `${iterator.value as string}`,
+          value: `${iterator.value[0] as string}`,
         });
         break;
       case 'in':
