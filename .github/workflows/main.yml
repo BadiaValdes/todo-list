@@ -11,6 +11,6 @@ jobs:
         test: ['Test it']
     steps:
       - name: 'Run echo'
-        run: echo 'Test me ok' && echo 'Node version ${{node-version}}' && echo ' test ${{test}}'
+        run: echo 'Test me ok' && echo 'Node version ${{matrix.node-version}}' && echo ' test ${{matrix.test}}'
 
       
