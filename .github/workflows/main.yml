@@ -7,5 +7,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Run echo'
-        run: echo 'Test me ok $GITHUB_WORKSPACE'
+        run: echo 'Test me ok ${GITHUB_WORKSPACE}'
       
