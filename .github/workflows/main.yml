@@ -5,7 +5,12 @@ on: ["push"]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['16']
+        test: ['Test it']
     steps:
       - name: 'Run echo'
-        run: echo 'Test me ok ${GITHUB_WORKSPACE}'
+        run: echo 'Test me ok ${{GITHUB_WORKSPACE}}' && echo 'Node version ${{node-version}}' && echo ' test ${{test}}'
+
       
