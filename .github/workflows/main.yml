@@ -13,6 +13,6 @@ jobs:
         test: ['Test it']
     steps:
       - name: 'Run echo'
-        run: echo ${github.event}
+        run: echo ${{github.event}}
 
       
