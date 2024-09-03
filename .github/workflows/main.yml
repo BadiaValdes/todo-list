@@ -13,6 +13,8 @@ jobs:
         test: ['Test it']
     steps:
       - name: 'Run echo'
-        run: echo ${{toJson(github.event)}}
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo ${{GITHUB_CONTEXT}}
 
       
