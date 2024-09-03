@@ -14,9 +14,9 @@ jobs:
     steps:
       - name: 'Run echo 1'
         run: echo 'Se ejecutó el paso 1'
-        if: contains(github.event.commits[0].message, 'Step 1') 
+        if: contains(github.event.commits[0].message, '[Step 1]') 
       - name: 'Run echo 2'
         run: echo 'Se ejecutó el paso 2'
-        if: contains(github.event.commits[0].message, 'Step 2')
+        if: contains(github.event.commits[0].message, '[Step 2]')
 
       
