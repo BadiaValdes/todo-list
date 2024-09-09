@@ -12,20 +12,17 @@ pool:
 variables:
   NODE_VERSION: $(node-version)
 
-stages:
-  - stage: Install
-    jobs:
-      - job: Test1
-        steps:
-          - script: |
-                    echo "Estoy instalando la version de node $(NODE_VERSION)"
-            displayName: "Texto de prueba" 
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '$(NODE_VERSION)'
-            displayName: 'Install Node.js'
 
-          - script: |
-              npm install
-            displayName: 'Instalando depenendencias'
+steps:
+  - script: |
+            echo "Estoy instalando la version de node $(NODE_VERSION)"
+    displayName: "Texto de prueba" 
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '$(NODE_VERSION)'
+    displayName: 'Install Node.js'
+
+  - script: |
+      npm install
+    displayName: 'Instalando depenendencias'
 
