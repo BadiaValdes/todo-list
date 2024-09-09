@@ -3,26 +3,13 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
-trigger:
-- master
+trigger: # Hace referencia al disparador
+- master # En este caso cuando se haga una acción sobre la rama master.
 
-pool:
-  vmImage: ubuntu-latest
+pool: # El pool de forma global quiere decir que usaremos esta config para todos los jobs
+  vmImage: ubuntu-latest # En este caso estoy usando la imagen de ubuntu-latest
 
-variables:
-  NODE_VERSION: $(node-version)
-
-
-steps:
-  - script: |
-            echo "Estoy instalando la version de node $(NODE_VERSION)"
-    displayName: "Texto de prueba" 
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '$(NODE_VERSION)'
-    displayName: 'Install Node.js'
-
-  - script: |
-      npm install
-    displayName: 'Instalando depenendencias'
-
+steps: # Esto son los pasos a seguir para el despliegue
+- script: | # Este es un script multilínea, el | representa esta opci'on de multi linea
+    echo "TEST ME"
+  displayName: 'npm install and build' # Nombre a mostrar en pantalla
